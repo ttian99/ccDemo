@@ -142,13 +142,14 @@ var ScrollViewLayer2 = cc.Layer.extend({
     initStat: function() {
         console.log('------- ScrollViewLayer --------');
         var size = cc.winSize;
+        // var size = cc.size(cc.winSize.width / 5, cc.winSize.height / 5);
 
-        // var scrollLayer = this.scrollLayer = new cc.LayerColor(cc.color.RED);
-        var scrollLayer = this.scrollLayer = new cc.Layer();
+        var scrollLayer = this.scrollLayer = new cc.LayerColor(cc.color.RED);
+        // var scrollLayer = this.scrollLayer = new cc.Layer();
         scrollLayer.height = size.height * 2;
         scrollLayer.width = size.width * 11;
 
-        var newSize = cc.size(size.width * 3, size.height);
+        var newSize = cc.size(size.width * 3, size.height * 2);
 
         // 创建scrollview
         var scrollView = this.scrollView = new cc.ScrollView(newSize, scrollLayer);
@@ -158,38 +159,59 @@ var ScrollViewLayer2 = cc.Layer.extend({
         // 设置旋转
         scrollView.setRotation(-45);
         scrollView.setAnchorPoint(0, 0);
-        scrollView.y = -size.width * 3 / 4;
-    
+
+        var posY = Math.SQRT2 * cc.winSize.height / 2 + cc.winSize.width / 2;
+        var disH = (Math.SQRT2 - 1) * cc.winSize.height / 2;
+        console.log(posY, disH);
+        // console.log("== disH ========= " + disH);
+        var ccc = cc.winSize.height / 2;
+        scrollView.y = -ccc;
+        // posX = (cc.winSize.height / 2 - cc.winSize.width / 2) * Math.SQRT1_2;
+
+        
+        // scrollView.x = cc.winSize.width / 2 + posX;
+        // scrollView.y = cc.winSize.height / 2 - cc.winSize.width / 2;
+        // scrollView.x =  Math.SQRT2 * cc.winSize.height / 2;
+        // scrollView.x =  cc.winSize.height / 2;
+        // scrollView.setContentOffset(cc.p(cc.winSize.width / 2, 0), true);
         this.addChild(scrollView);
 
         // 设置监听 
         scrollView.setDelegate(this);
         console.log(scrollView);
 
-       
         // 设置
-        this.mid = 1000;
-        this.len = 500;
-        this.area = 400;
+        // this.mid 推导公式：this.mid + ball.x + cc.winSize.height / 2  = Math.SQRT2 * (Math.SQRT2 * cc.winSize.height / 2 + cc.winSize.width /2); 
+        // ==> this.mid = cc.winSize.height / 2 + (Math.SQRT2 * cc.winSize.width / 2) - ball.x;
+        // ball.x = 0;
+        // ==> this.mid = cc.winSize.height / 2 + (Math.SQRT2 * cc.winSize.width / 2)
+        this.mid = (cc.winSize.height / 2 + (Math.SQRT2 * cc.winSize.width / 2));
+        console.log("====== this.mid ========== "  + this.mid);
+        // this.mid = 0
+        this.len = 425;
+        this.area = 160;
 
         //创建星球
         for (var i = 1; i < 12; i++) {
             var planet = new cc.Sprite("res/" + i + ".png");
             planet.x = (i - 1) * this.len + this.mid;
             planet.y = size.height / 2;
-            planet.rotation = 45;
+            // planet.y = 0;
+            // planet.rotation = 45;
             scrollLayer.addChild(planet);
         }
-        this.checkPos(0);
-
+        // this.checkPos(0);
     },
     scrollViewDidScroll: function(view) {
+        console.log("-------------- view. pos-------------- ")
+        console.log(view.x, view.y);
         console.log("--------- scrollViewDidScroll --------------");
+        console.log(view.getContentOffset());
         var offsetPosX = view.getContentOffset().x; //获得scrollLayer的偏移x坐标
         this.checkPos(offsetPosX);
     },
     scrollViewDidZoom: function(view) {
-        console.log("---------- scrollViewDidScroll ------------");
+        console.log("---------- scrollViewDidZoom ------------");
     },
 
     checkPos: function(offsetPosX) {
@@ -197,9 +219,52 @@ var ScrollViewLayer2 = cc.Layer.extend({
         var arr = this.scrollLayer.getChildren();
         console.log(arr);
         for (var i = 0; i < arr.length; i++) {
+
+            console.log(arr[i].x , arr[i].y);
             var endPosX = arr[i].x + offsetPosX;
             console.log("endPosX = " + endPosX);
             
+
+            // if (endPosX == this.mid) {
+            //     var s1 = endPosX / this.mid;
+            //     console.log('== s1 == ' + s1);
+            //     var scale = 3;
+            //     arr[i].scale = scale;
+            // } else if (endPosX == this.mid - this.area || endPosX == this.mid + this.area) {
+            //     var s2 = endPosX / this.mid;
+            //     console.log('== s2 == ' + s2);
+            //     var scale = 1;
+            //     arr[i].scale = scale;
+            // } else if (endPosX < this.mid && endPosX > this.mid - this.area){
+            //     var s3 = endPosX / this.mid;
+            //     console.log('== s3 == ' + s3);
+            //     var scale = 1.3;
+            //     arr[i].scale = scale;
+            // } else if (endPosX > this.mid && endPosX < this.mid + this.area){
+            //     var s4 = endPosX / this.mid;
+            //     console.log('== s4 == ' + s4);
+            //     var scale = 2.3;
+            //     arr[i].scale = scale;
+            // }
+
+
+            // if (endPosX <= this.mid && endPosX > (this.mid - this.area)) {
+            //     var s1 = Math.abs(endPosX) / this.mid;
+            //     console.log("s1 =  " + s1);
+            //     var scale = 2 - s1;
+            //     arr[i].scale = scale;
+            // } else if (endPosX > this.mid && endPosX < (this.mid + this.area)) {
+            //     var s2 = Math.abs(endPosX) / this.mid;
+            //     console.log("s2 = " + s2);
+            //     var scale = s2;
+            //     arr[i].scale = scale;
+            // } else {
+            //     var s3 = endPosX / (this.mid - this.area);
+            //     console.log("s3 = " + s3);
+            //     arr[i].scale = 1;
+            // }
+
+            // 原来的测试
             if (endPosX <= this.mid && endPosX > (this.mid - this.area)) {
                 var s1 = Math.abs(endPosX) / this.mid;
                 console.log("s1 =  " + s1);
@@ -216,8 +281,6 @@ var ScrollViewLayer2 = cc.Layer.extend({
                 console.log("s3 = " + s3);
                 arr[i].scale = 0.3;
             }
-
-
 
 
             // console.log('arr[i].x = ' + arr[i].x, " | endPosX = " + endPosX );
